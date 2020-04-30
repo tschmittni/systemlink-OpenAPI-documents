@@ -1,0 +1,212 @@
+swagger: '2.0'
+info:
+  version: v1
+  title: SystemLink License Service
+  description: SystemLink License Service HTTP API
+  contact:
+    name: National Intruments
+    url: 'https://www.ni.com/systemlink'
+    email: support@ni.com
+basePath: /nilicense/v1
+consumes:
+  - application/json
+produces:
+  - application/json
+securityDefinitions:
+  ApiKeyAuth:
+    type: apiKey
+    name: x-ni-api-key
+    in: header
+security:
+  - ApiKeyAuth: []
+schemes:
+  - https
+paths:
+  /components/statuses:
+    post:
+      tags:
+        - components
+      summary: Get Component Statuses
+      operationId: statuses
+      parameters:
+        - name: request
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/GetComponentStatusesRequest'
+      responses:
+        '200':
+          description: GetComponentStatusesResponse
+          schema:
+            $ref: '#/definitions/GetComponentStatusesResponse'
+        '400':
+          description: ErrorResponse
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+  /components/evaluate:
+    post:
+      tags:
+        - components
+      summary: Start Evaluation
+      operationId: evaluate
+      parameters:
+        - name: request
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/StartEvaluationRequest'
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+  /components/checkout-user-licenses:
+    post:
+      tags:
+        - components
+      summary: Check Out Licenses
+      operationId: checkout-user-licenses
+      parameters:
+        - name: request
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/CheckoutUserLicensesRequest'
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+  /components/checkin-user-licenses:
+    post:
+      tags:
+        - components
+      summary: Check In Licenses
+      operationId: checkin-user-licenses
+      parameters:
+        - name: request
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/CheckinUserLicensesRequest'
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+definitions:
+  GetComponentStatusesRequest:
+    type: object
+    properties:
+      components:
+        type: array
+        items:
+          $ref: '#/definitions/ComponentStatusRequest'
+        readOnly: true
+  ComponentStatusRequest:
+    type: object
+    properties:
+      name:
+        type: string
+        readOnly: true
+      version:
+        type: string
+        readOnly: true
+  GetComponentStatusesResponse:
+    type: object
+    properties:
+      result:
+        type: array
+        items:
+          $ref: '#/definitions/ComponentStatus'
+        readOnly: true
+      error:
+        $ref: '#/definitions/SkylineError'
+        readOnly: true
+  ComponentStatus:
+    description: Component Status
+    type: object
+    properties:
+      name:
+        description: Component Name
+        type: string
+        readOnly: true
+      version:
+        description: Component Version
+        type: string
+        readOnly: true
+      status:
+        description: Component Status
+        enum:
+          - NOT_LICENSED
+          - LICENSED
+          - DEMO
+          - FULL_DEMO
+        type: string
+        readOnly: true
+      remainingDays:
+        format: int32
+        description: Remaining Days
+        type: integer
+        readOnly: true
+      isServerCheckout:
+        type: boolean
+        readOnly: true
+  SkylineError:
+    type: object
+    properties:
+      name:
+        type: string
+        readOnly: true
+      code:
+        format: int32
+        type: integer
+        readOnly: true
+      message:
+        type: string
+        readOnly: true
+      args:
+        type: array
+        items:
+          type: string
+        readOnly: true
+  ErrorResponse:
+    type: object
+    properties: {}
+  StartEvaluationRequest:
+    type: object
+    properties:
+      components:
+        type: array
+        items:
+          $ref: '#/definitions/ComponentStatusRequest'
+        readOnly: true
+      requireExactVersion:
+        type: boolean
+        readOnly: true
+  CheckoutUserLicensesRequest:
+    type: object
+    properties:
+      components:
+        type: array
+        items:
+          $ref: '#/definitions/ComponentStatusRequest'
+        readOnly: true
+      users:
+        type: array
+        items:
+          type: string
+        readOnly: true
+  CheckinUserLicensesRequest:
+    type: object
+    properties:
+      components:
+        type: array
+        items:
+          $ref: '#/definitions/ComponentStatusRequest'
+        readOnly: true
+      users:
+        type: array
+        items:
+          type: string
+        readOnly: true
